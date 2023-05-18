@@ -55,3 +55,34 @@ func EstimateWithRandom2(difficulty int) game.Estimate {
 		return r
 	}
 }
+
+// EstimateWithOptimization generates an automated estimate function for a game with a given difficulty.
+// The function uses a combination of candidate elimination and feedback from the game to make educated guesses.
+func EstimateWithOptimization(difficulty int) game.Estimate {
+	candidates := game.GenerateCandidates(difficulty)
+	maxCandidates := game.FactorialDivision(10, difficulty)
+	filteredCandidates := make([][]int, maxCandidates)
+
+	return func(question game.Question) []int {
+		if len(candidates) == 0 {
+			fmt.Println("No more candidates.")
+			return nil
+		}
+
+		estimate := candidates[0]
+		candidates = candidates[1:]
+
+		hit, blow := question(estimate)
+		filteredIndex := 0
+
+		for i := 0; i < len(candidates); i++ {
+			if game.GetHit(candidates[i], estimate) == hit && game.GetBlow(candidates[i], estimate) == blow {
+				filteredCandidates[filteredIndex] = candidates[i]
+				filteredIndex++
+			}
+		}
+
+		candidates = filteredCandidates[:filteredIndex]
+		return estimate
+	}
+}

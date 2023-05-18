@@ -102,3 +102,46 @@ func GetBlow(guess []int, answer []int) int {
 	}
 	return count
 }
+
+// FactorialDivision calculates the division of two factorials: n! / (n-k)!
+// It computes the result by multiplying numbers from n down to n-k.
+func FactorialDivision(n, k int) int {
+	if n < k || n <= 0 || k <= 0 {
+		return 0
+	}
+
+	result := 1
+	for i := 0; i < k; i++ {
+		result *= n - i
+	}
+
+	return result
+}
+
+// GenerateCandidates generates all possible combinations of unique digits for a given difficulty level.
+func GenerateCandidates(difficulty int) [][]int {
+	candidates := make([][]int, 0)
+	used := make([]bool, 10)
+
+	var generateCandidates func(int, []int)
+	generateCandidates = func(digit int, candidate []int) {
+		if digit == difficulty {
+			newCandidate := make([]int, difficulty)
+			copy(newCandidate, candidate)
+			candidates = append(candidates, newCandidate)
+			return
+		}
+
+		for i := 0; i < 10; i++ {
+			if !used[i] {
+				used[i] = true
+				candidate[digit] = i
+				generateCandidates(digit+1, candidate)
+				used[i] = false
+			}
+		}
+	}
+
+	generateCandidates(0, make([]int, difficulty))
+	return candidates
+}
